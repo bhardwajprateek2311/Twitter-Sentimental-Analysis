@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Twitter Search Box</title>
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+	<script type="text/javascript">
+
+
+function openNav() {
+  document.getElementById("myNav").style.width = "100%";
+}
+
+function closeNav() {
+  document.getElementById("myNav").style.width = "0%";
+}
+
+
+
+</script>
+
+
+
+
+	<style >
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+@import url('https://fonts.googleapis.com/css?family=Ubuntu');
+@import url(https://fonts.googleapis.com/css?family=Leckerli+One);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+body{
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.a1{
+	width: 100%;
+	height: 110px;
+	background-color: #0036FF;
+	position: fixed;
+	z-index: 1;
+}
+
+h1{ 
+  font-family: 'Open Sans', sans-serif;
+  color: #FEFEFE;
+  margin-top: 0; 
+  margin-left: 400px;
+  width: 100%;
+  font-family: 'Leckerli One', cursive;
+  text-shadow: 0 2px rgba(0,0,0,.5);
+  font-size: 80px;
+}
+
+
+.row {
+  max-width: 80%;
+  margin: 0 auto;
+}
+
+.overlay {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  background-color: rgb(0,0,0);
+  overflow-x: hidden;
+  transition: 0.5s;
+}
+
+.overlay-content {
+  font-family: 'Open Sans', sans-serif;
+  font-family: 'Leckerli One', cursive;
+  position: relative;
+  top: 25%;
+  width: 100%;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.overlay a {
+  padding: 12px;
+  text-decoration: none;
+  font-size: 48px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+.overlay a:hover, .overlay a:focus {
+  color: #f1f1f1;
+}
+
+.overlay .closebtn {
+  position: absolute;
+  top: 5px;
+  right: 45px;
+  font-size: 170px;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    height: 100vh;
+    width: 100%;
+}
+
+
+
+@media screen and (max-width: 768px){
+.overlay a {font-size: 20px}
+  .overlay .closebtn {
+  font-size: 40px;
+  top: 15px;
+  right: 35px;
+  }
+}
+
+/*return button */
+.btn {
+  background-color: DodgerBlue;
+  border: none;
+  color: white;
+  padding: 12px 30px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+  background-color: RoyalBlue;
+}
+
+
+
+
+	</style>
+
+
+
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	
+</head>
+
+
+
+<body style="background-image: url('{{ url_for( 'static', filename='image/bg10.jpg') }}')">
+	
+    <div id="myNav" class="overlay">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+  <div class="overlay-content">
+    <a href="{{url_for('button')}}">HOME</a>
+    <a href="#">ABOUT</a>
+    <a href="#">RESUME</a>
+    <a href="#">CONTACT</a>
+    <a href="{{url_for('login')}}">Logout</a>
+  </div>
+</div>
+
+<div class="a1">
+	<span style="font-size:80px;color: #FEFEFE;cursor:pointer;position: fixed;top: 0px" onclick="openNav()">&#9776;</span>
+	<h1>Twitter Sentimental Analysis </h1> 
+  
+<p class="lead">Could not find the page.</p>
+<hr class="my-4">
+
+
+<form action="{{ url_for( 'index') }}">
+   <button type="submit" class="btn" style="margin-left:245px;margin-bottom: 30px;margin-top: 30px;width: 500px;">Return to Home</button>
+</form>
+</div>
+
+
+
+</body>
+</html>

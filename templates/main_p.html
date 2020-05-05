@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Twitter Search Box</title>
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+	<script type="text/javascript">
+// Load google charts
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawChart);
+
+// Draw the chart and set the chart values
+function drawChart() {
+{%for i in range(length)%}
+  var data{{i}} = google.visualization.arrayToDataTable([
+  ['Task', 'Hours per Day'],
+  ['More Positive', {{details[i][2]}}],
+  ['Positive', {{details[i][3]}}],
+  ['Negative', {{details[i][4]}}],
+  ['More Negative', {{details[i][5]}}],
+  ['Neutral', {{details[i][6]}}],
+]);
+
+  // Optional; add a title and set the width and height of the chart
+  var options{{i}} = {'title':'Sentiment for the word - "{{details[i][0]}}" in '+{{details[i][2]+details[i][3]+details[i][4]+details[i][5]+details[i][6]}}+' tweets',titleTextStyle: {
+        color: '#0000FF',
+        fontName: 'Times New Roman', // i.e. 
+        fontSize: 40, // 12, 18 whatever you want (don't specify px)
+        bold: true,    // true or false
+        italic: true   // true of false
+    },is3D: true, 'width':1045, 'height':825};
+
+  // Display the chart inside the <div> element with id="piechart"
+  
+  var chart{{i}} = new google.visualization.PieChart(document.getElementById('piechart{{i}}'));
+  chart{{i}}.draw(data{{i}}, options{{i}});
+  {%endfor%}
+}
+
+function openNav() {
+  document.getElementById("myNav").style.width = "100%";
+}
+
+function closeNav() {
+  document.getElementById("myNav").style.width = "0%";
+}
+
+/*bar chart*/
+window.onload = function () {
+	{%for i in range(length)%}
+
+var chart{{i}} = new CanvasJS.Chart("chartContainer{{i}}", {
+	width: 1500,
+	height: 700,
+  animationEnabled: true,
+  title:{
+    text: 'Sentiment for the word - "{{details[i][0]}}" in '+{{details[i][2]+details[i][3]+details[i][4]+details[i][5]+details[i][6]}}+' tweets'
+  },
+  axisY: {
+    title: "Tweets"
+  },
+  legend: {
+    cursor:"pointer",
+    itemclick : toggleDataSeries
+  },
+  toolTip: {
+    shared: true,
+    content: toolTipFormatter
+  },
+  data: [{
+    type: "bar",
+    showInLegend: true,
+    name: "No. of Tweets",
+    color: "gold",
+    dataPoints: [
+      { y: {{details[i][6]}}, label: "Neutral" },
+      { y: {{details[i][5]}}, label: "More Negative" },
+      { y: {{details[i][4]}}, label: "Negative" },
+      { y: {{details[i][3]}}, label: "Positive" },
+      { y: {{details[i][2]}}, label: "More Positive" } 
+    ]
+  },
+  {
+    type: "bar",
+    showInLegend: true,
+    name: "Tweet %",
+    color: "silver",
+    dataPoints: [
+      { y: {{details[i][6]/total[i]*100}}, label: "Neutral" },
+      { y: {{details[i][5]/total[i]*100}}, label: "More Negative" },
+      { y: {{details[i][4]/total[i]*100}}, label: "Negative" },
+      { y: {{details[i][3]/total[i]*100}}, label: "Positive" },
+      { y: {{details[i][2]/total[i]*100}}, label: "More Positive" } 
+    ]
+  }]
+});
+chart{{i}}.render();
+
+function toolTipFormatter(e) {
+  var str = "";
+  var total = 0 ;
+  var str3;
+  var str2 ;
+  for (var i = 0; i < e.entries.length; i++){
+    var str1 = "<span style= \"color:"+e.entries[i].dataSeries.color + "\">" + e.entries[i].dataSeries.name + "</span>: <strong>"+  e.entries[i].dataPoint.y + "</strong> <br/>" ;
+    total = e.entries[i].dataPoint.y + total;
+    str = str.concat(str1);
+  }
+  str2 = "<strong>" + e.entries[0].dataPoint.label + "</strong> <br/>";
+  str3 = "<span style = \"color:Tomato\">Total: </span><strong>" + total + "</strong><br/>";
+  return (str2.concat(str)).concat(str3);
+}
+
+function toggleDataSeries(e) {
+  if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+    e.dataSeries.visible = false;
+  }
+  else {
+    e.dataSeries.visible = true;
+  }
+  chart{{i}}.render();
+}
+
+{%endfor%}
+//line graph
+
+var chart = new CanvasJS.Chart("chartContainer", {
+  title: {
+    text: "Comparison Of Tweets"
+  },
+  axisX: {
+  	title: "Sentiments",
+  },
+  axisY2: {
+    title: "No.Of Tweets",
+  },
+  toolTip: {
+    shared: true
+  },
+  legend: {
+    cursor: "pointer",
+    verticalAlign: "top",
+    horizontalAlign: "center",
+    dockInsidePlotArea: true,
+    itemclick: toogleDataSeries1
+  },
+	data: [{
+    type:"line",
+    axisYType: "secondary",
+    name: '{{details[0][0]}}',
+    showInLegend: true,
+    markerSize: 0,
+    dataPoints: [   
+      { y: {{details[0][2]}}, label: "More Positive" },
+      { y: {{details[0][3]}}, label: "Positive" },
+      { y: {{details[0][4]}}, label: "Negative" },
+      { y: {{details[0][5]}}, label: "More Negative" },
+      { y: {{details[0][6]}}, label: "Neutral" }
+    ]
+  }
+  {%for i in range(1,length)%}
+  ,{
+    type:"line",
+    axisYType: "secondary",
+    name: '{{details[i][0]}}',
+    showInLegend: true,
+    markerSize: 0,
+    dataPoints: [   
+      { y: {{details[i][2]}}, label: "More Positive" },
+      { y: {{details[i][3]}}, label: "Positive" },
+      { y: {{details[i][4]}}, label: "Negative" },
+      { y: {{details[i][5]}}, label: "More Negative" },
+      { y: {{details[i][6]}}, label: "Neutral" }
+    ]
+  }
+  {%endfor%}
+
+
+
+  ]
+});
+chart.render();
+
+function toogleDataSeries1(e){
+  if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+    e.dataSeries.visible = false;
+  } else{
+    e.dataSeries.visible = true;
+  }
+  chart.render();
+}
+
+}
+
+</script>
+
+
+
+
+	<style >
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+@import url('https://fonts.googleapis.com/css?family=Ubuntu');
+@import url(https://fonts.googleapis.com/css?family=Leckerli+One);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+
+body{
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.a1{
+	width: 100%;
+	height: 110px;
+	background-color: #0036FF;
+	position: fixed;
+	z-index: 1;
+}
+
+h1{ 
+  font-family: 'Open Sans', sans-serif;
+  color: #FEFEFE;
+  margin-top: 0; 
+  margin-left: 400px;
+  width: 100%;
+  font-family: 'Leckerli One', cursive;
+  text-shadow: 0 2px rgba(0,0,0,.5);
+  font-size: 80px;
+}
+
+h2{
+  font-family: 'Open Sans', sans-serif;
+  color: #2B65EC;
+  margin: 0; 
+  width: 100%;
+  margin-left: 70px;
+  font-family: 'Leckerli One', cursive;
+  text-shadow: 0 2px rgba(0,0,0,.5);
+  font-size: 80px;
+}
+
+h3{
+  font-family: 'Open Sans', sans-serif;
+  color: #2B65EC;
+  margin: 0; 
+  width: 100%;
+  margin-left: 245px;
+  font-family: 'Leckerli One', cursive;
+  text-shadow: 0 2px rgba(0,0,0,.5);
+  font-size: 80px;
+  margin-top: 500px;
+  margin-bottom: 20px;
+}
+
+h4{
+  font-family: 'Open Sans', sans-serif;
+  color: #2B65EC;
+  margin: 0; 
+  width: 100%;
+  margin-left: 245px;
+  font-family: 'Leckerli One', cursive;
+  text-shadow: 0 2px rgba(0,0,0,.5);
+  font-size: 80px;
+  margin-top: 300px;
+  margin-bottom: 20px;
+}
+
+.row {
+  max-width: 80%;
+  margin: 0 auto;
+}
+
+.overlay {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  background-color: rgb(0,0,0);
+  overflow-x: hidden;
+  transition: 0.5s;
+}
+
+.overlay-content {
+  font-family: 'Open Sans', sans-serif;
+  font-family: 'Leckerli One', cursive;
+  position: relative;
+  top: 25%;
+  width: 100%;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.overlay a {
+  padding: 12px;
+  text-decoration: none;
+  font-size: 48px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+.overlay a:hover, .overlay a:focus {
+  color: #f1f1f1;
+}
+
+.overlay .closebtn {
+  position: absolute;
+  top: 5px;
+  right: 45px;
+  font-size: 170px;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    height: 100vh;
+    width: 100%;
+}
+
+
+
+@media screen and (max-width: 768px){
+.overlay a {font-size: 20px}
+  .overlay .closebtn {
+  font-size: 40px;
+  top: 15px;
+  right: 35px;
+  }
+}
+
+input[type="radio"] {
+  display: none;
+}
+.js-slider {
+  top: 250px;
+  position: relative;
+  width: 80%;
+  height: 100vh;
+  margin: 0 auto;
+}
+.js-slider_item {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  padding: 1rem 3rem;
+  opacity: 0;
+  visibility: hidden;
+  transform-origin: right center;
+  transform: translate3d(0%, 0%, 0) rotateY(30deg) scaleX(0.95);
+  transition: all 1s ease,transform 1s cubic-bezier(0.43, 0.28, 0.51, 1);
+}
+
+{%for i in range(length) %}
+#s-{{i}}:checked ~ .js-slider .js-slider_item.img-{{i}} {
+  opacity: 1;
+  visibility: visible;
+  transform-origin: left center;
+  transform: translate3d(0, 0, 0) rotateY(0deg) scaleX(1);
+}
+{% endfor %}
+
+.js-slider_img {
+  left: 10%;
+  width: 70%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.c-img-h-full {
+  position: absolute;
+  background-size: cover;
+  border-top: 8px solid #0000FF;
+  border-bottom: 8px solid #0000FF;
+  border-left: 8px solid #0000FF;
+  border-right: 8px solid #0000FF;
+  top: 50%;
+  left: 50%;
+  width: 98%;
+  height: 82%;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+.js-slider_nav {
+  position: absolute;
+  left: 0;
+  top: 30%;
+  width: 100%;
+  transform: translate3d(0, -50%, 0);
+}
+.js-slider_nav_item.prev {
+  left: 0;
+}
+.js-slider_nav_item.next {
+  right: 0;
+  transform: rotateY(180deg);
+}
+.js-slider_nav_item {
+  top: 141px;
+  position: absolute;
+  display: none;
+  width: 6rem;
+  height: 6rem;
+  border: 4px solid #0000FF;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 1s all cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+.js-slider_nav_item:before {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 1rem;
+  top: 55%;
+  width: 2rem;
+  height: 4px;
+  background-color: #0000FF;
+  transform-origin: left bottom;
+  transform: translate3d(0, -50%, 0) rotate(-45deg);
+  transition: 1s all cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+.js-slider_nav_item:hover {
+   transform: translate3d(-30%, 0, 0);
+}
+.js-slider_nav_item.next:hover {
+   transform: rotateY(180deg) translate3d(-30%, 0, 0);
+}
+.js-slider_nav_item:hover:before {
+  transform: translate3d(0, -50%, 0) rotate(-30deg);
+}
+.js-slider_nav_item:after {
+  content: "";
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  width: 3.9rem;
+  height: 4px;
+  background-color: #0000FF;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+{%for i in range(length) %}
+#s-{{i}}:checked ~ .js-slider .js-slider_nav .s-nav-{{i}}{
+  display: block;
+}
+{% endfor %}
+
+.js-slider_indicator {
+  position: absolute;
+  left: 0;
+  top: 98vh;
+  width: 100%;
+  text-align: center;
+}
+.js-slider-indi {
+  position: relative;
+  display: inline-block;
+  padding: 2rem;
+  cursor: pointer;
+}
+.js-slider-indi:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 55px;
+  height: 2px;
+  border-radius: 2px;
+  background: #87CEFA;
+  transform: translate3d(-50%, -50%, 0);
+}
+.js-slider-indi:hover:after {
+  background-color: #1E90FF;
+  height: 5px;
+  transition: 1s all cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+{%for i in range(length) %}
+#s-{{i}}:checked ~ .js-slider .js-slider_indicator .indi-{{i}}:after{
+  background-color: #0000FF;
+  height: 5px;
+}
+{% endfor %}
+
+
+
+/*bar chart*/
+
+.slideshow-container {
+  width: 1500px;
+  height: 700px;
+  position: relative;
+  overflow: hidden;
+  margin: auto;
+}
+
+/* Hide the images by default */
+.mySlides {
+  display: none;
+  border-radius: 8px solid #0000FF;
+}
+
+/* Next & previous buttons */
+.prev1, .next1 {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  margin-top: -22px;
+  padding: 16px;
+  color: rgb(255,0,0);
+  font-weight: bold;
+  font-size: 18px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  user-select: none;
+  background: #C2DFFF;
+}
+
+/* Position the "next button" to the right */
+.next1 {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+/* On hover, add a black background color with a little bit see-through */
+.prev1:hover, .next1:hover {
+  background-color: rgba(0,0,0,0.8);
+}
+
+/* Caption text */
+.text {
+  color: #f2f2f2;
+  font-size: 15px;
+  padding: 8px 12px;
+  position: absolute;
+  bottom: 8px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Number text (1/3 etc) */
+.numbertext {
+  color: #f2f2f2;
+  font-size: 12px;
+  padding: 8px 12px;
+  position: absolute;
+  top: 0;
+}
+
+/* The dots/bullets/indicators */
+.dot {
+  cursor: pointer;
+  width: 55px;
+  height: 5px;
+  margin: 0 2px;
+  background-color: #bbb;
+  display: inline-block;
+  transition: background-color 0.6s ease;
+}
+
+.active, .dot:hover {
+  background-color: #717171;
+}
+
+/* Fading animation */
+.fade {
+  -webkit-animation-name: fade;
+  -webkit-animation-duration: 1.5s;
+  animation-name: fade;
+  animation-duration: 1.5s;
+}
+
+@-webkit-keyframes fade {
+  from {opacity: .4}
+  to {opacity: 1}
+}
+
+@keyframes fade {
+  from {opacity: .4}
+  to {opacity: 1}
+}
+
+
+/* Style buttons */
+.btn {
+  background-color: DodgerBlue;
+  border: none;
+  color: white;
+  padding: 12px 30px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+  background-color: RoyalBlue;
+}
+
+
+
+
+	</style>
+
+
+
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	
+</head>
+
+
+
+<body style="background-image: url('{{ url_for( 'static', filename='image/bg10.jpg') }}')">
+	
+    <div id="myNav" class="overlay">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+  <div class="overlay-content">
+    <a href="{{url_for('button')}}">HOME</a>
+    <a href="#">ABOUT</a>
+    <a href="#">RESUME</a>
+    <a href="#">CONTACT</a>
+    <a href="{{url_for('login')}}">Logout</a>
+  </div>
+</div>
+
+<div class="a1">
+	<span style="font-size:80px;color: #FEFEFE;cursor:pointer;position: fixed;top: 0px" onclick="openNav()">&#9776;</span>
+	<h1>Twitter Sentimental Analysis </h1>
+</div>
+
+
+<input type="radio" id="s-0" name="slider-control" checked="checked">
+{%for i in range(1,length) %}
+<input type="radio" id="s-{{i}}" name="slider-control">
+{% endfor %}
+
+<div class="js-slider">
+	<h2>Pie Chart Analysis :-</h2>
+{%for i in range(length) %}
+ <figure class="js-slider_item img-{{i}}">
+    <div class="js-slider_img">
+      <div class="c-img-h-full" id="piechart{{i}}" alt=""></div>
+    </div>
+  </figure>
+{% endfor %}
+
+  <div class="js-slider_nav">
+  	{%for i in range(length) %}
+	<label class="js-slider_nav_item s-nav-{{i}} prev" for="s-{{details[i-1][1]}}"></label>
+    <label class="js-slider_nav_item s-nav-{{i}} next" for="s-{{details[(i+1)%length][1]}}"></label>
+	{% endfor %}
+   
+  </div>
+  <div class="js-slider_indicator">
+  	{%for i in range(length) %}
+	<label class="js-slider-indi indi-{{i}}" for="s-{{i}}"></label>
+	{% endfor %}
+  </div>
+</div>
+
+
+
+<h3>Bar Graph Analysis :-</h3>
+
+
+
+
+<div class="slideshow-container" style="border: 8px solid #0000FF;">
+
+  <!-- Full-width images with number and caption text -->
+  {%for i in range(length)%}
+  <div class="mySlides fade" >
+    <div class="numbertext">{{i+1}} / {{length}}</div>
+    <div id="chartContainer{{i}}" style="height: 100%; width: 100%;"></div>
+  </div>
+  {%endfor%}
+
+
+  <!-- Next and previous buttons -->
+  <a class="prev1" onclick="plusSlides(-1)">&#10094;</a>
+  <a class="next1" onclick="plusSlides(1)">&#10095;</a>
+</div>
+<br>
+
+<!-- The dots/circles -->
+
+<div style="text-align:center;margin-bottom: 120px;">
+  {%for i in range(length)%}
+  <label class="dot" onclick="currentSlide({{i+1}})"></label>
+  {%endfor%}
+</div>
+
+<script type="text/javascript">
+	var slideIndex = 1;
+showSlides(slideIndex);
+
+// Next/previous controls
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+// Thumbnail image controls
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  var i;
+  var slides = document.getElementsByClassName("mySlides");
+  var dots = document.getElementsByClassName("dot");
+  if (n > slides.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none";
+  }
+  for (i = 0; i < dots.length; i++) {
+      dots[i].className = dots[i].className.replace(" active", "");
+  }
+  slides[slideIndex-1].style.display = "block";
+  dots[slideIndex-1].className += " active";
+}
+
+</script>
+
+<h4>Line Graph Analysis :-</h4>
+
+<div id="chartContainer" style="margin-left:245px;border: 8px solid #0000FF;height: 800px; width: 80%;"></div>
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+
+<form method="get" action="{{ url_for( 'static', filename='t_ana.zip') }}">
+   <button type="submit" class="btn" style="margin-left:245px;margin-bottom: 30px;margin-top: 30px;width: 500px;"><i class="fa fa-download"></i> Download</button>
+</form>
+</body>
+</html>
